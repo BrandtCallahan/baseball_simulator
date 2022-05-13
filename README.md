@@ -25,6 +25,3 @@ This function is a function that will return a list to us including run totals f
 
 ## Simulation()
 This function is a function that will allow you to run TruegameSim() as many times as you wish. You can set up a simulation to run thousands of times in order to see long term trends for teams with respective On Base Percentages. The output includes the number of wins for each team and the winning percentage for each team. It also includes per game averages for the offensive statistics discussed earlier. 
-
-## Playoff7()
-This function will allow you to run through a 7 game series between two teams. The function will bring in two teams' OBP and name. It will run the series just like a true 7 game series where the first 2 games are at home for the better-record team, followed by 3 games with the other team acting as the home team, and finally 2 more games with the original home/away setup. After the 4th game, the games become "if necessary" meaning they may not happen because the series as a whole is a best of 7. This means that as soon as one team wins 4 games then the series is over. The user must input the team names and their respective OBP and the code will do the rest outputting the winner of the series and the series record, i.e. The Dodger's won [4,2] in 6 games.
