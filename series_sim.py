@@ -345,11 +345,11 @@ def simulation(n, game_number, lineup_stats, pitching_matchup_stats):
             round(float(sum(Ktotal1) / n), 2), round(float(sum(Ktotal2) / n), 2)]
 
 
-def series_simulation(lineup_stats, pitching_matchup_stats, series_len):
+def series_simulation(lineup_stats, pitching_matchup_stats, series_len, n):
     series = []
     for game_num in range(series_len):
         logger.info(f"Game {game_num + 1} of {lineup_stats[0][0][0]} vs. {lineup_stats[1][0][0]}")
-        sim_game = simulation(5000, game_num + 1, lineup_stats, pitching_matchup_stats)
+        sim_game = simulation(n, game_num + 1, lineup_stats, pitching_matchup_stats)
 
         if sim_game[1] > sim_game[3]:
             print(
