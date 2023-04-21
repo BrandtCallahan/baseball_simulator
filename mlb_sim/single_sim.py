@@ -1,15 +1,12 @@
-import random
-from random import uniform
+from datetime import datetime
+
 import pandas as pd
-from datetime import date
 from logzero import logger
 
-# from inning_utils import Lineup, AtBat, baserunning
-# from game_utils import inning, gameboard
-# from mlb_lineups import matchup_list, game_gambling
+from game_utils import inning, gameboard
+
 
 # lays the ground work to give us totals on a single game
-
 def truegamesim(game_number, matchup_list, lineup_stats, pitching_matchup_stats):
     team1name = matchup_list[game_number][0]
     team2name = matchup_list[game_number][1]
@@ -36,11 +33,10 @@ def truegamesim(game_number, matchup_list, lineup_stats, pitching_matchup_stats)
     FOtotal2 = []
     PCtotal2 = []
 
-    r1 = 0  # team 1 runs
-    r2 = 0  # team 2 runs
-
-    scoreboard1 = gameboard(game_number, 0, lineup_stats, pitching_matchup_stats)  # runs team 1 gameboard (first 8 innings)
-    scoreboard2 = gameboard(game_number, 1, lineup_stats, pitching_matchup_stats)  # runs team 2 gameboard (first 8 innings)
+    scoreboard1 = gameboard(game_number, matchup_list, 0, lineup_stats,
+                            pitching_matchup_stats)  # runs team 1 gameboard (first 8 innings)
+    scoreboard2 = gameboard(game_number, matchup_list, 1, lineup_stats,
+                            pitching_matchup_stats)  # runs team 2 gameboard (first 8 innings)
 
     rg1 = scoreboard1[0]  # runs for team 1
     rg2 = scoreboard2[0]  # runs for team 2
@@ -98,7 +94,8 @@ def truegamesim(game_number, matchup_list, lineup_stats, pitching_matchup_stats)
     i = 9  # sets an index that will come in play later
     sb = [1, 2, 3, 4, 5, 6, 7, 8, 9]  # sets up our inning list
 
-    hrl1 = inning(game_number, lineup_stats, 0, pitching_matchup_stats, 1, scoreboard1[-1])  # call the inning to run
+    hrl1 = inning(game_number, matchup_list, lineup_stats, 0, pitching_matchup_stats, 1,
+                  scoreboard1[-1])  # call the inning to run
     ri1 = hrl1[0]  # index out the runs
     r1 = ri1  # makes the road team (first listed) have their 9th AB
     rg1 += [r1]  # adds their runs to the run list
@@ -131,7 +128,8 @@ def truegamesim(game_number, matchup_list, lineup_stats, pitching_matchup_stats)
 
     # runs if needed
     if sum(rg1) >= sum(rg2):  # keeps the bottom of 9th optional
-        hrl2 = inning(game_number, lineup_stats, 1, pitching_matchup_stats, 0, scoreboard2[-1])  # call the inning for team two
+        hrl2 = inning(game_number, matchup_list, lineup_stats, 1, pitching_matchup_stats, 0,
+                      scoreboard2[-1])  # call the inning for team two
         ri2 = hrl2[0]  # index out the runs
         r2 = ri2  # if played runs the 9th for team 2 (home team)
         rg2 += [r2]  # adds their runs to the runs list
@@ -165,8 +163,10 @@ def truegamesim(game_number, matchup_list, lineup_stats, pitching_matchup_stats)
     # runs as long as run totals are equal
     while sum(rg1) == sum(rg2):  # creates an extra inning parameter
         i += 1  # index that adds 1 to the already made inning list
-        hrl1 = inning(game_number, lineup_stats, 0, pitching_matchup_stats, 1, scoreboard2[-1])  # an extra inning for team 1
-        hrl2 = inning(game_number, lineup_stats, 1, pitching_matchup_stats, 0, scoreboard2[-1])  # an extra inning for team 2
+        hrl1 = inning(game_number, matchup_list, lineup_stats, 0, pitching_matchup_stats, 1,
+                      scoreboard2[-1])  # an extra inning for team 1
+        hrl2 = inning(game_number, matchup_list, lineup_stats, 1, pitching_matchup_stats, 0,
+                      scoreboard2[-1])  # an extra inning for team 2
         ri1 = hrl1[0]  # index runs for team 1
         ri2 = hrl2[0]  # index runs for team 2
         r1 = ri1
@@ -242,6 +242,19 @@ def truegamesim(game_number, matchup_list, lineup_stats, pitching_matchup_stats)
 def single_simulation(n, game_number, matchup_list, lineup_stats, pitching_matchup_stats, game_gambling):
     team1name = matchup_list[game_number][0]
     team2name = matchup_list[game_number][1]
+    favorite = game_gambling[game_number][1]
+
+    # record the starting pitchers
+    away_pitcher = pitching_matchup_stats[game_number][0][0][0]
+    home_pitcher = pitching_matchup_stats[game_number][1][0][0]
+
+    # record the lineups
+    away_lineup = []
+    for batter in lineup_stats[game_number][0]:
+        away_lineup += [batter[0]]
+    home_lineup = []
+    for batter in lineup_stats[game_number][1]:
+        home_lineup += [batter[0]]
 
     logger.info(f"{team1name} vs. {team2name}")
 
@@ -272,8 +285,6 @@ def single_simulation(n, game_number, matchup_list, lineup_stats, pitching_match
     tt1w = 0  # team 1 win total
     tt2w = 0  # team 2 win total
 
-    ml_away = 0
-    ml_home = 0
     spread_away = 0
     spread_home = 0
     over = 0
@@ -285,7 +296,8 @@ def single_simulation(n, game_number, matchup_list, lineup_stats, pitching_match
         tw1 = 0  # team 1 win
         tw2 = 0  # team 2 win
 
-        g = truegamesim(game_number, matchup_list, lineup_stats, pitching_matchup_stats)  # assign function truegame to variable g
+        g = truegamesim(game_number, matchup_list, lineup_stats,
+                        pitching_matchup_stats)  # assign function truegame to variable g
 
         # team 1 stats per game
         RUNt1 = g[1]
@@ -349,12 +361,8 @@ def single_simulation(n, game_number, matchup_list, lineup_stats, pitching_match
         PCtotal2 = PCtotal2 + [PCt2]
 
         # tally up gambling results
-        # moneyline
-        ml_away = tt1w
-        ml_home = tt2w
 
         # spread
-        favorite = game_gambling[game_number][1]
         if favorite == team1name:
             spread_team1 = RUNt1 - RUNt2
             if spread_team1 >= 1.5:
@@ -378,36 +386,38 @@ def single_simulation(n, game_number, matchup_list, lineup_stats, pitching_match
         else:
             push += 1
 
-    logger.info(f"Moneyline Results: Favorite = {favorite}")
-    print(team1name, "won", tt1w, "out of", n, "games. Which is", round(float(tt1w / n) * 100, 2),
-          "percent of games played.")
-    print(team2name, "won", tt2w, "out of", n, "games. Which is", round(float(tt2w / n) * 100, 2),
-          "percent of games played.")
+    if favorite == team1name:
+        fav_ml_win = tt1w
+        dog_ml_win = tt2w
+        fav_spread_win = spread_away
+        dog_spread_win = spread_home
+    elif favorite == team2name:
+        fav_ml_win = tt2w
+        dog_ml_win = tt1w
+        fav_spread_win = spread_home
+        dog_spread_win = spread_away
 
-    logger.info(f"Spread Results: Favorite = {favorite}")
-    print(team1name, "hit on the spread", spread_away, "out of", n, "games. Which is", round(float(spread_away / n) * 100, 2), "percent of games played.")
-    print(team2name, "hit on the spread", spread_home, "out of", n, "games. Which is",
-          round(float(spread_home / n) * 100, 2), "percent of games played.")
+    df = pd.DataFrame(
+        data={"date": [datetime.now().strftime("%Y-%m-%d")],
+              "away_team": [team1name],
+              "away_pitcher": [away_pitcher],
+              "away_lineup": [away_lineup],
+              "home_team": [team2name],
+              "home_pitcher": [home_pitcher],
+              "home_lineup": [home_lineup],
+              "favorite": [favorite],
+              "away_team_ml_pct": [round(float(tt1w / n), 4)],
+              "home_team_ml_pct": [round(float(tt2w / n), 4)],
+              "away_team_spread_pct": [round(float(spread_away / n), 4)],
+              "home_team_spread_pct": [round(float(spread_home / n), 4)],
+              "fav_ml_pct": [round(float(fav_ml_win / n), 4)],
+              "dog_ml_pct": [round(float(dog_ml_win / n), 4)],
+              "fav_spread_pct": [round(float(fav_spread_win / n), 4)],
+              "dog_spread_pct": [round(float(dog_spread_win / n), 4)],
+              "over_pct": [round(float(over / n), 4)],
+              "under_pct": [round(float(under / n), 4)],
+              "push_pct": [round(float(push / n), 4)],
+              },
+    )
 
-    logger.info(f"Over/Under Results: {ou}")
-    print(f"The over hit", over, "out of", n, "games. Which is", round(float(over / n) * 100, 2), "percent of games played.")
-    print("The under hit", under, "out of", n, "games. Which is", round(float(under / n) * 100, 2),
-          "percent of games played.")
-    print("The game pushed", push, "out of", n, "games. Which is", round(float(push / n) * 100, 2),
-          "percent of games played.")
-
-    # print(team1name, ":", int(sum(RUNtotal1) / n), "R/G,",
-    #       round(float((sum(B1total1) + sum(B2total1) + sum(B3total1) + sum(HRtotal1)) / n), 2), "H/G,",
-    #       round(float(sum(BBtotal1) / n), 2), "BB/G,", round(float(sum(B1total1) / n), 2), "1B/G,",
-    #       round(float(sum(B2total1) / n), 2), "2B/G,", round(float(sum(B3total1) / n), 2), "3B/G,",
-    #       round(float(sum(HRtotal1) / n), 2), "HR/G, and left", int(sum(LOBtotal1) / n), "men on base per game.")
-    # print(team1name, ":", round(float(sum(Ktotal1) / n), 2), "K/G", round(float(sum(GOtotal1) / n), 2), "GO/G",
-    #       round(float(sum(FOtotal1) / n), 2), "FO/G", round(float(sum(PCtotal1) / n), 2), "Pitches/G.")
-    # print(team2name, ":", int(sum(RUNtotal2) / n), "R/G,",
-    #       round(float((sum(B1total2) + sum(B2total2) + sum(B3total2) + sum(HRtotal2)) / n), 2), "H/G,",
-    #       round(float(sum(BBtotal2) / n), 2), "BB/G,", round(float(sum(B1total2) / n), 2), "1B/G,",
-    #       round(float(sum(B2total2) / n), 2), "2B/G,", round(float(sum(B3total2) / n), 2), "3B/G,",
-    #       round(float(sum(HRtotal2) / n), 2), "HR/G, and left", int(sum(LOBtotal2) / n), "men on base per game.")
-    # print(team2name, ":", round(float(sum(Ktotal2) / n), 2), "K/G", round(float(sum(GOtotal2) / n), 2), "GO/G",
-    #       round(float(sum(FOtotal2) / n), 2), "FO/G", round(float(sum(PCtotal2) / n), 2), "Pitches/G.")
-
+    return df
