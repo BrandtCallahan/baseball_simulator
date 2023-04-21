@@ -135,10 +135,10 @@ def get_baseball_reference_team(full_team_name):
     :param full_team_name: team name in the Rotowire dictionary
     :return: Baseball Reference team abbreviation
     """
-    # if rotowire_team_dict[full_team_name] == "Los Angeles Angels":
-    #     team = baseball_reference_team_dict.inv["Los Angeles Angels of Anaheim"]
-    # else:
-    #     team = baseball_reference_team_dict.inv[rotowire_team_dict[full_team_name]]
-    team = team_name_dict[full_team_name]
+    if rotowire_team_dict[full_team_name] == "Los Angeles Angels":
+        team = baseball_reference_team_dict.inv["Los Angeles Angels of Anaheim"]
+    else:
+        team = baseball_reference_team_dict.inv[rotowire_team_dict[full_team_name]]
+    # team = team_name_dict[full_team_name]
 
     return team
