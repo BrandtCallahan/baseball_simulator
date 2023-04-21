@@ -1,5 +1,6 @@
 """
-Below code comes from https://github.com/fultoncjb/mlb-scraper
+Take some time to figure out this code.
+It has everything that I need to scrape: lineups, pitchers, and gambling lines.
 """
 from beautiful_soup_helper import get_soup_from_url
 
@@ -170,11 +171,46 @@ def get_game_lineups(url=None, game_date=None):
                             str(game_time))
 
         if current_game.is_valid():
+            #     game_factors = get_external_game_factors(game_node, home_team_abbreviation)
+            #     # TODO figure out if we can just not populate these fields
+            #     if game_factors is not None:
+            #         current_game.wind_speed = game_factors.wind_speed
+            #         current_game.umpire_name = game_factors.ump_name
+            #     else:
+            #         current_game.wind_speed = 0
+            #         current_game.umpire_name = "Unknown"
             games.append(current_game)
-        else:
-            print("Game between %s and %s is not valid." % (away_team_abbreviation, home_team_abbreviation))
+        # else:
+        #     print("Game between %s and %s is not valid." % (away_team_abbreviation, home_team_abbreviation))
 
     return games
+
+
+# def get_external_game_factors(game_node, home_team_abbreviation):
+#     """
+#     :param game_node: BeautifulSoup object containing the game from the daily lineups page
+#     :return: a GameEntry containing the
+#     """
+#     try:
+#         extra_node = game_node.find("div", {"class": "lineup__extra"})
+#         weather_node = extra_node.find("div", {"class": "lineup__weather"}).find("div",
+#                                                                                  {"class": "lineup__weather-text"})
+#         wind_speed = get_wind_speed(weather_node)
+#         temperature = get_temperature(weather_node)
+#         """TODO: add temperature
+#         For now, we will use nominal temperature and umpire readings
+#         """
+#         ump_name = None
+#         try:
+#             ump_name = get_ump_name(game_node)
+#         except UmpDataNotFound:
+#             print("Ump data not found.")
+#         park_hitter_score, park_pitcher_score = get_team_info(get_baseball_reference_team(home_team_abbreviation))
+#         game_factors = GameFactors(wind_speed, ump_name, park_pitcher_score, park_hitter_score)
+#     except AttributeError:
+#         game_factors = None
+#
+#     return game_factors
 
 
 def get_id(soup):
