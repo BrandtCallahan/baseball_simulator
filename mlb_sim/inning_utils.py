@@ -1,8 +1,4 @@
-import random
 from random import uniform
-import pandas as pd
-from datetime import date
-from mlb_lineups import lineup_stats
 
 
 # run through the lineup
@@ -14,6 +10,7 @@ def Lineup(game_number,
            away_home_pitcher,
            batter,
            pitchcount):
+
     game = lineup_stats
     matchup = [matchup_list[game_number][0], matchup_list[game_number][1]]
     lineup = game[game_number][away_home_lineup]
@@ -22,7 +19,7 @@ def Lineup(game_number,
     team = matchup[away_home_pitcher]
     pitcher = pitching_matchup_stats[game_number][away_home_pitcher][0]
 
-    if pitchcount <= 85:
+    if pitchcount <= 90:
         atbat = AtBat(lineup[batter][1], pitcher[1]) + [batter]  # starter
     else:
         atbat = AtBat(lineup[batter][1], pitcher[3]) + [batter]  # relief (median of bullpen WHIP)
@@ -51,7 +48,6 @@ def AtBat(obp, whip):
     outcomelist = []
 
     aboutcome = []
-    # ab_tracker = []
 
     while (ball < 4 and strike < 3) and (out < 1 and ob < 1):
         pitch = (uniform(0, 3))  # ball/strike
@@ -129,7 +125,6 @@ def AtBat(obp, whip):
 
         pitchnum = 1
 
-        # new_pitch = Pitch(count, pitch, whip, obp, swing, contact, fair, outcome, umperror, count_dict)
         count_var = f"{ball}{strike}"
 
         if pitch < whip:  # ball
@@ -176,8 +171,6 @@ def AtBat(obp, whip):
                             out = 0
                             ob = 1
 
-        # ab_tracker += [new_pitch]
-
         count = [ball] + [strike]
 
         pitchlist += [pitch]
@@ -215,17 +208,11 @@ def AtBat(obp, whip):
 
 # this lays the groundwork for baserunners moving around the bases
 # it is atbat specific
+def baserunning(game_number, lineup_stats, aPOSlist, atbat, batter, away_home_lineup):
 
-def baserunning(game_number, aPOSlist, atbat, batter, away_home_lineup):
-    # atbat=[walk,hit,abSLG]
-
-    # single = 0.62
     single = lineup_stats[game_number][away_home_lineup][batter][3]
-    # double = 0.82
     double = lineup_stats[game_number][away_home_lineup][batter][4] + single
-    # triple = 0.84
     triple = lineup_stats[game_number][away_home_lineup][batter][5] + (single + double)
-    # homer = 1
     homer = lineup_stats[game_number][away_home_lineup][batter][6] + (single + double + triple)
     basesruns = []
     SLG = atbat[2]
