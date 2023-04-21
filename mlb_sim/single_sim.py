@@ -406,6 +406,7 @@ def single_simulation(n, game_number, matchup_list, lineup_stats, pitching_match
               "home_pitcher": [home_pitcher],
               "home_lineup": [home_lineup],
               "favorite": [favorite],
+              "over_under": [ou],
               "away_team_ml_pct": [round(float(tt1w / n), 4)],
               "home_team_ml_pct": [round(float(tt2w / n), 4)],
               "away_team_spread_pct": [round(float(spread_away / n), 4)],
