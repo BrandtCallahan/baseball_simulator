@@ -16,7 +16,7 @@ def Lineup(game_number,
     game = lineup_stats
     matchup = [game[0][0][0], game[1][0][0]]
     lineup = game[away_home_lineup]
-    pitching_matchup = [pitching_matchup_stats[away_home_lineup][game_number-1][1], 
+    pitching_matchup = [pitching_matchup_stats[away_home_lineup][game_number-1][1],
                         pitching_matchup_stats[away_home_pitcher][game_number-1][1]]
     pitcher = pitching_matchup_stats[away_home_pitcher][game_number-1]
 
@@ -213,6 +213,7 @@ def AtBat(obp, whip):
 
 # this lays the groundwork for baserunners moving around the bases
 # it is atbat specific
+
 def baserunning(aPOSlist, atbat, batter, away_home_lineup):
     # atbat=[walk,hit,abSLG]
 

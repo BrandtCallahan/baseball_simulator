@@ -1,19 +1,17 @@
-import random
 from random import uniform
-import pandas as pd
-from datetime import date
-from logzero import logger
 
-from inning_utils import Lineup, AtBat, baserunning
+from inning_utils import Lineup, baserunning
 
 
 # now we set the groundwork for an inning to take place
 def inning(game_number,
+           matchup_list,
            lineup_stats,
            away_home_lineup,
            pitching_matchup_stats,
            away_home_pitcher,
            batter=None):
+
     o = 0  # outs start at 0
     aPOSlist = [0, 0, 0]  # start with nobody on
     POSLIST = []  # list of runners moving around bases
@@ -42,35 +40,34 @@ def inning(game_number,
 
     while o < 3:  # inning continues as long as there are less than 3 outs
 
-        # logger.info(f"{lineup_stats[away_home_lineup][batter][1]} is now batting with {o} outs")
-
-        # AB = Lineup(game, away_home_lineup, away_home_pitcher, batter)
         # player SLG %
-        single_num = (lineup_stats[away_home_lineup][batter][4])
-        double_num = (lineup_stats[away_home_lineup][batter][5] + single_num)
-        triple_num = (lineup_stats[away_home_lineup][batter][6] + (double_num))
-        homer_num = (lineup_stats[away_home_lineup][batter][7] + (triple_num))
+        single_num = (lineup_stats[game_number][away_home_lineup][batter][3])
+        double_num = (lineup_stats[game_number][away_home_lineup][batter][4] + single_num)
+        triple_num = (lineup_stats[game_number][away_home_lineup][batter][5] + (double_num))
+        homer_num = (lineup_stats[game_number][away_home_lineup][batter][6] + (triple_num))
         total_hits = 0
-        for i in range(4, 8):
-            total_hits += lineup_stats[away_home_lineup][batter][i]
-        single = (lineup_stats[away_home_lineup][batter][4]) / total_hits
-        double = (lineup_stats[away_home_lineup][batter][5] + single_num) / total_hits
-        triple = (lineup_stats[away_home_lineup][batter][6] + (double_num)) / total_hits
-        homer = (lineup_stats[away_home_lineup][batter][7] + (triple_num)) / total_hits
+        for i in range(3, 7):
+            total_hits += lineup_stats[game_number][away_home_lineup][batter][i]
+        single = (lineup_stats[game_number][away_home_lineup][batter][3]) / total_hits
+        double = (lineup_stats[game_number][away_home_lineup][batter][4] + single_num) / total_hits
+        triple = (lineup_stats[game_number][away_home_lineup][batter][5] + (double_num)) / total_hits
+        homer = (lineup_stats[game_number][away_home_lineup][batter][6] + (triple_num)) / total_hits
 
-        try:
-            AB = Lineup(game_number, lineup_stats, away_home_lineup, pitching_matchup_stats, away_home_pitcher, batter,
-                        pitchcount)
-        except NameError:
-            AB = Lineup(game_number, lineup_stats, away_home_lineup, pitching_matchup_stats, away_home_pitcher, batter,
-                        pitchcount=0)
-        # at bat strikeout,groundout,flyout,walk,hit,pitchcount, batter num
+        AB = Lineup(game_number,
+                    matchup_list,
+                    lineup_stats,
+                    away_home_lineup,
+                    pitching_matchup_stats,
+                    away_home_pitcher,
+                    batter,
+                    pitchcount)
+
+        # at bat: strikeout,groundout,flyout,walk,hit,pitchcount, batter num
         pitchnum = AB[5]
 
         abSLG = uniform(0, 1)  # create the SLG % value
 
         atbat = [AB[3], AB[4], abSLG]  # pairs up the OBP (hit/no hit) and SLG (hit type)
-        # abl += [atbat] # list the hits in order of occurance
         abWALK = atbat[0]
         abHIT = atbat[1]
         SLG = atbat[2]
@@ -140,7 +137,7 @@ def inning(game_number,
                     rs = 0
 
         if abWALK == 1 or abHIT == 1:
-            baserun = baserunning(aPOSlist, atbat, batter, away_home_lineup)
+            baserun = baserunning(game_number, lineup_stats, aPOSlist, atbat, batter, away_home_lineup)
             aPOSlist = baserun[
                 0]  # index out where players are on base shown in list form (i.e. [1,0,0] = man on first)
             rs = baserun[1]  # index out the runs scored
@@ -163,10 +160,14 @@ def inning(game_number,
 
     return off
 
-    
+
 # now the scoreboard to keep track of runs and the inning
 # this function only sets up one teams "scoreboard" though
-def gameboard(game_number, away_home_lineup, lineup_stats, pitching_matchup_stats):
+def gameboard(game_number,
+              matchup_list,
+              away_home_lineup,
+              lineup_stats,
+              pitching_matchup_stats,):
     sbi = []  # scoreboard inning
     sbr = []  # scoreboard runs
     sbh = []  # scoreboard on base
@@ -195,7 +196,12 @@ def gameboard(game_number, away_home_lineup, lineup_stats, pitching_matchup_stat
             batter = 0
         else:
             batter = hrl[12]
-        hrl = inning(game_number, lineup_stats, away_home_lineup, pitching_matchup_stats, away_home_pitcher,
+        hrl = inning(game_number,
+                     matchup_list,
+                     lineup_stats,
+                     away_home_lineup,
+                     pitching_matchup_stats,
+                     away_home_pitcher,
                      batter)  # hrl = hit/run list
         r = hrl[0]  # index the runs
         h = hrl[1]  # index the amount on base

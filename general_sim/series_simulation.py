@@ -241,7 +241,7 @@ def truegamesim(game_number, lineup_stats, pitching_matchup_stats):
 
 
 # runs the simulation n number of times
-def simulation(n, game_number, lineup_stats, pitching_matchup_stats):
+def series(n, game_number, lineup_stats, pitching_matchup_stats):
     team1name = lineup_stats[0][0][0]
     team2name = lineup_stats[1][0][0]
 
@@ -345,11 +345,11 @@ def simulation(n, game_number, lineup_stats, pitching_matchup_stats):
             round(float(sum(Ktotal1) / n), 2), round(float(sum(Ktotal2) / n), 2)]
 
 
-def series_simulation(lineup_stats, pitching_matchup_stats, series_len, n):
-    series = []
+def series_simulation(n, series_len, lineup_stats, pitching_matchup_stats):
+    series_result = []
     for game_num in range(series_len):
         logger.info(f"Game {game_num + 1} of {lineup_stats[0][0][0]} vs. {lineup_stats[1][0][0]}")
-        sim_game = simulation(n, game_num + 1, lineup_stats, pitching_matchup_stats)
+        sim_game = series(n, game_num + 1, lineup_stats, pitching_matchup_stats)
 
         if sim_game[1] > sim_game[3]:
             print(
@@ -362,6 +362,6 @@ def series_simulation(lineup_stats, pitching_matchup_stats, series_len, n):
             print(f"{pitching_matchup_stats[1][game_num][1]} is the winning pitcher.")
             print(f"{pitching_matchup_stats[0][game_num][1]} is the losing pitcher.")
 
-        series += [sim_game]
+        series_result += [sim_game]
 
-    return series
+    return series_result
