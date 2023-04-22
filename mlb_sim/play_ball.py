@@ -30,17 +30,22 @@ def play_ball_mlb(stats_years=None):
             logger.info(f"Error with {matchup_list[game][0]} vs. {matchup_list[game][1]}")
             continue
 
-    if not os.path.exists(f"/Users/bcallahan/Desktop/mlb_simulator/daily_mlb_games.csv"):
+    # insert your user information
+    user = ""
+    dir_path = f"{user}/Desktop/mlb_simulator/"
+    file_path = dir_path + "daily_mlb_games.csv"
+    
+    if not os.path.exists(file_path):
         logger.info(f"Creating .csv file")
-        os.mkdir(f"/Users/bcallahan/Desktop/mlb_simulator/")
-        daily_games.to_csv(f"~/Desktop/mlb_simulator/daily_mlb_games.csv")
+        os.mkdir(dir_path)
+        daily_games.to_csv(file_path)
 
-    elif os.path.exists(f"/Users/bcallahan/Desktop/mlb_simulator/daily_mlb_games.csv"):
+    elif os.path.exists(file_path):
         logger.info(f"Loading previous data")
-        temp_df = pd.read_csv(f"~/Desktop/mlb_simulator/daily_mlb_games.csv")
+        temp_df = pd.read_csv(file_path)
         logger.info(f"Appending today's games: {datetime.now().strftime('%Y-%m-%d')}")
         all_games = pd.concat([temp_df, daily_games]).reset_index(drop=True)
-        all_games.to_csv(f"~/Desktop/mlb_simulator/daily_mlb_games.csv")
+        all_games.to_csv(file_path)
 
     logger.info(f"Complete")
     return daily_games
