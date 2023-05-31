@@ -3,7 +3,6 @@ import re
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from team_dict import team_dict, team_name_dict
 from logzero import logger
 
 
@@ -106,10 +105,6 @@ def stats(season_years: list):
         player_bat_df["3B"] = player_bat_df["3B"].astype(float)
         player_bat_df["HR"] = player_bat_df["HR"].astype(float)
 
-        # # team batting
-        # team_bat = pullTable(bat_url, 'teams_standard_batting')
-        # team_bat = team_bat[~(team_bat['Tm'] == 'League Average') & ~(team_bat['Tm'] == '')]
-
         # pitching stats url
         pitch_url = f'https://www.baseball-reference.com/leagues/majors/{season_year}-standard-pitching.shtml'
         find_pitch_tables = findTables(pitch_url)  # find the associated tables
@@ -128,12 +123,6 @@ def stats(season_years: list):
         player_pitch_df = player_pitch.groupby(["Name"]).agg(Tm=("Tm", "last"),
                                                              WHIP=("WHIP", "median"),
                                                              ERA=("ERA", "median")).reset_index()
-
-        # team pitching
-        # team_pitch = pullTable(pitch_url, 'teams_standard_pitching')
-        # team_pitch = team_pitch[~(team_pitch['Tm'] == 'League Average') & ~(team_pitch['Tm'] == '')]
-        # team_pitch["Team"] = team_pitch["Tm"].map(team_name_dict)
-        # team_pitch = team_pitch[["Team", "WHIP"]]
 
         # add years
         player_bat_df["year"] = season_year
