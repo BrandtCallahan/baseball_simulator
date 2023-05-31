@@ -31,9 +31,11 @@ def play_ball_mlb(stats_years=None):
             logger.info(f"Error with {matchup_list[game][0]} vs. {matchup_list[game][1]}")
             continue
 
-    user = "/Users/bcallahan"
+    # insert your user information
+    user = ""
     dir_path = f"{user}/Desktop/mlb_simulator/"
     file_path = dir_path + "daily_mlb_games.csv"
+    
     if not os.path.exists(file_path):
         logger.info(f"Creating .csv file")
         os.mkdir(dir_path)
@@ -65,6 +67,7 @@ def play_ball_mlb(stats_years=None):
                                "under_pct",
                                "push_pct",
                                ]]
+
         all_games.to_csv(file_path)
 
     logger.info(f"Complete")
