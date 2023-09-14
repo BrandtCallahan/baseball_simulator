@@ -6,7 +6,7 @@ from mlb_lineups import pregame_lineups
 from datetime import datetime
 
 
-def play_ball_mlb_daily(stats_years=None):
+def play_ball_mlb_daily(stats_years=None, save=False):
 
     logger.info(f"Running: {datetime.now().strftime('%Y-%m-%d')}")
     if stats_years is None:
@@ -37,7 +37,8 @@ def play_ball_mlb_daily(stats_years=None):
     if not os.path.exists(file_path):
         logger.info(f"Creating .csv file")
         os.mkdir(dir_path)
-        daily_games.to_csv(file_path)
+        if save_csv:
+            daily_games.to_csv(file_path)
 
     elif os.path.exists(file_path):
         logger.info(f"Loading previous data")
@@ -65,7 +66,8 @@ def play_ball_mlb_daily(stats_years=None):
                                "under_pct",
                                "push_pct",
                                ]]
-        all_games.to_csv(file_path)
+        if save_csv:
+            all_games.to_csv(file_path)
 
     logger.info(f"Complete")
     return daily_games
