@@ -11,7 +11,6 @@ Module used for scraping data from rotowire.com
 
 from datetime import datetime, date
 from team_dict import *
-from baseball_reference import get_team_info, TableNotFound
 
 # Daily lineups relevant HTML labels
 DAILY_LINEUPS_URL = "https://www.rotowire.com/baseball/daily-lineups.php"
@@ -186,33 +185,6 @@ def get_game_lineups(url=None, game_date=None):
     return games
 
 
-# def get_external_game_factors(game_node, home_team_abbreviation):
-#     """
-#     :param game_node: BeautifulSoup object containing the game from the daily lineups page
-#     :return: a GameEntry containing the
-#     """
-#     try:
-#         extra_node = game_node.find("div", {"class": "lineup__extra"})
-#         weather_node = extra_node.find("div", {"class": "lineup__weather"}).find("div",
-#                                                                                  {"class": "lineup__weather-text"})
-#         wind_speed = get_wind_speed(weather_node)
-#         temperature = get_temperature(weather_node)
-#         """TODO: add temperature
-#         For now, we will use nominal temperature and umpire readings
-#         """
-#         ump_name = None
-#         try:
-#             ump_name = get_ump_name(game_node)
-#         except UmpDataNotFound:
-#             print("Ump data not found.")
-#         park_hitter_score, park_pitcher_score = get_team_info(get_baseball_reference_team(home_team_abbreviation))
-#         game_factors = GameFactors(wind_speed, ump_name, park_pitcher_score, park_hitter_score)
-#     except AttributeError:
-#         game_factors = None
-#
-#     return game_factors
-
-
 def get_id(soup):
     """ Get the RotoWire ID from a BeautifulSoup node
     :param soup: BeautifulSoup object of the player in the daily lineups page
@@ -275,6 +247,11 @@ def get_name_from_id(rotowire_id):
     """
     player_soup = get_soup_from_url(PLAYER_PAGE_BASE_URL + str(rotowire_id))
     return player_soup.find("div", {"class": PLAYER_PAGE_LABEL}).find("h1").text.strip()
+
+
+class TableNotFound(Exception):
+    def __init__(self, table_name):
+        super(TableNotFound, self).__init__("Table '%s' not found in the Baseball Reference page" % table_name)
 
 
 class HitterNotFound(Exception):

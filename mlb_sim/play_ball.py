@@ -6,8 +6,9 @@ from mlb_lineups import pregame_lineups
 from datetime import datetime
 
 
-def play_ball_mlb(stats_years=None):
+def play_ball_mlb_daily(stats_years=None):
 
+    logger.info(f"Running: {datetime.now().strftime('%Y-%m-%d')}")
     if stats_years is None:
         stats_years = []
     if len(stats_years) == 0:
@@ -30,11 +31,9 @@ def play_ball_mlb(stats_years=None):
             logger.info(f"Error with {matchup_list[game][0]} vs. {matchup_list[game][1]}")
             continue
 
-    # insert your user information
-    user = ""
-    dir_path = f"{user}/Desktop/mlb_simulator/"
+    username = "bcallahan"
+    dir_path = f"/Users/{username}/Desktop/mlb_simulator/"
     file_path = dir_path + "daily_mlb_games.csv"
-    
     if not os.path.exists(file_path):
         logger.info(f"Creating .csv file")
         os.mkdir(dir_path)
@@ -45,6 +44,27 @@ def play_ball_mlb(stats_years=None):
         temp_df = pd.read_csv(file_path)
         logger.info(f"Appending today's games: {datetime.now().strftime('%Y-%m-%d')}")
         all_games = pd.concat([temp_df, daily_games]).reset_index(drop=True)
+        all_games = all_games[["date",
+                               "away_team",
+                               "away_pitcher",
+                               "away_lineup",
+                               "home_team",
+                               "home_pitcher",
+                               "home_lineup",
+                               "favorite",
+                               "over_under",
+                               "away_team_ml_pct",
+                               "home_team_ml_pct",
+                               "away_team_spread_pct",
+                               "home_team_spread_pct",
+                               "fav_ml_pct",
+                               "dog_ml_pct",
+                               "fav_spread_pct",
+                               "dog_ml_pct",
+                               "over_pct",
+                               "under_pct",
+                               "push_pct",
+                               ]]
         all_games.to_csv(file_path)
 
     logger.info(f"Complete")
