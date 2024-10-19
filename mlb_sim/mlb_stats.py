@@ -69,29 +69,29 @@ def stats(season_years: list):
         # player batting
         player_bat = pullTable(bat_url, 'players_standard_batting')
         player_bat = player_bat[~(player_bat['Rk'] == '')]
-        player_bat['Name'] = player_bat['Player'] # fix naming bug
+        player_bat = player_bat.rename(columns={"Player": "Name", "Team": "Tm"}) # fix naming bug
         for i in player_bat.index:
             player_bat_list = player_bat["Name"][i].split("\xa0")
             # player_bat["Name"][i] = player_bat_list[0] + " " + player_bat_list[1]
             for charc in special_charc:
                 player_bat["Name"][i] = player_bat["Name"][i].replace(charc, "")
 
-        player_bat["OBP"] = player_bat["OBP"].replace("", ".000")
-        player_bat["SLG"] = player_bat["SLG"].replace("", ".000")
+        player_bat["OBP"] = player_bat["OBP"].replace("", ".000").astype(float)
+        player_bat["SLG"] = player_bat["SLG"].replace("", ".000").astype(float)
         player_bat["AB"] = player_bat["AB"].astype(int)
         player_bat["H"] = player_bat["H"].astype(int)
         player_bat["2B"] = player_bat["2B"].astype(int)
         player_bat["3B"] = player_bat["3B"].astype(int)
         player_bat["HR"] = player_bat["HR"].astype(int)
-        player_bat["Tm"] = player_bat["Team"] # fix naming bug
         player_bat_df = player_bat.groupby(["Name"]).agg(Tm=("Tm", "last"),
                                                          OBP=("OBP", "median"),
                                                          SLG=("SLG", "median"),
-                                                         abs=("AB", "sum"),
+                                                         ab=("AB", "sum"),
                                                          hits=("H", "sum"),
                                                          doubles=("2B", "sum"),
                                                          triples=("3B", "sum"),
                                                          homers=("HR", "sum")).reset_index()
+        player_bat_df = player_bat_df.rename(columns={"ab": "abs"})
         player_bat_df["singles"] = player_bat_df["hits"].astype(int) - (player_bat_df["doubles"].astype(int)
                                                                         + player_bat_df["triples"].astype(int)
                                                                         + player_bat_df["homers"].astype(int))
@@ -114,16 +114,15 @@ def stats(season_years: list):
         # player pitching
         player_pitch = pullTable(pitch_url, 'players_standard_pitching')
         player_pitch = player_pitch[~(player_pitch['Rk'] == '')]
-        player_pitch['Name'] = player_pitch['Player']
+        player_pitch = player_pitch.rename(columns={'Player': 'Name', 'Team': "Tm"})
         for i in player_pitch.index:
             player_pitch_list = player_pitch["Name"][i].split("\xa0")
             # player_pitch["Name"][i] = player_pitch_list[0] + " " + player_pitch_list[1]
             for charc in special_charc:
                 player_pitch["Name"][i] = player_pitch["Name"][i].replace(charc, "")
 
-        player_pitch["WHIP"] = player_pitch["WHIP"].replace("", "0.000")
-        player_pitch["ERA"] = player_pitch["ERA"].replace("", "0.00")
-        player_pitch["Tm"] = player_pitch["Team"] # fix naming bug
+        player_pitch["WHIP"] = player_pitch["WHIP"].replace("", "0.000").astype(float)
+        player_pitch["ERA"] = player_pitch["ERA"].replace("", "0.00").astype(float)
         player_pitch_df = player_pitch.groupby(["Name"]).agg(Tm=("Tm", "last"),
                                                              WHIP=("WHIP", "median"),
                                                              ERA=("ERA", "median")).reset_index()
