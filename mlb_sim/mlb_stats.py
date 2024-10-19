@@ -69,7 +69,7 @@ def stats(season_years: list):
         # player batting
         player_bat = pullTable(bat_url, 'players_standard_batting')
         player_bat = player_bat[~(player_bat['Rk'] == '')]
-        player_bat['Name'] = player_bat['Player']
+        player_bat['Name'] = player_bat['Player'] # fix naming bug
         for i in player_bat.index:
             player_bat_list = player_bat["Name"][i].split("\xa0")
             # player_bat["Name"][i] = player_bat_list[0] + " " + player_bat_list[1]
@@ -83,6 +83,7 @@ def stats(season_years: list):
         player_bat["2B"] = player_bat["2B"].astype(int)
         player_bat["3B"] = player_bat["3B"].astype(int)
         player_bat["HR"] = player_bat["HR"].astype(int)
+        player_bat["Tm"] = player_bat["Team"] # fix naming bug
         player_bat_df = player_bat.groupby(["Name"]).agg(Tm=("Tm", "last"),
                                                          OBP=("OBP", "median"),
                                                          SLG=("SLG", "median"),
@@ -122,6 +123,7 @@ def stats(season_years: list):
 
         player_pitch["WHIP"] = player_pitch["WHIP"].replace("", "0.000")
         player_pitch["ERA"] = player_pitch["ERA"].replace("", "0.00")
+        player_pitch["Tm"] = player_pitch["Team"] # fix naming bug
         player_pitch_df = player_pitch.groupby(["Name"]).agg(Tm=("Tm", "last"),
                                                              WHIP=("WHIP", "median"),
                                                              ERA=("ERA", "median")).reset_index()
