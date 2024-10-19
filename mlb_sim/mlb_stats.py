@@ -72,7 +72,7 @@ def stats(season_years: list):
         player_bat['Name'] = player_bat['Player']
         for i in player_bat.index:
             player_bat_list = player_bat["Name"][i].split("\xa0")
-            player_bat["Name"][i] = player_bat_list[0] + " " + player_bat_list[1]
+            # player_bat["Name"][i] = player_bat_list[0] + " " + player_bat_list[1]
             for charc in special_charc:
                 player_bat["Name"][i] = player_bat["Name"][i].replace(charc, "")
 
@@ -116,7 +116,7 @@ def stats(season_years: list):
         player_pitch['Name'] = player_pitch['Player']
         for i in player_pitch.index:
             player_pitch_list = player_pitch["Name"][i].split("\xa0")
-            player_pitch["Name"][i] = player_pitch_list[0] + " " + player_pitch_list[1]
+            # player_pitch["Name"][i] = player_pitch_list[0] + " " + player_pitch_list[1]
             for charc in special_charc:
                 player_pitch["Name"][i] = player_pitch["Name"][i].replace(charc, "")
 
