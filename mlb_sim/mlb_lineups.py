@@ -49,6 +49,10 @@ def pregame_lineups(stats_years):
         matchup_pitcher.append([away_pitcher, home_pitcher])
 
     # Set up each games' gambling lines
+    """
+        currently not lining up on matchups...
+        TODO: fix this piece to have gambling lines for all matchups
+    """
     gambling_lines = get_game_gambling(game_date=today)
     game_gambling = []
     for game in range(len(gambling_lines)):
@@ -80,77 +84,239 @@ def pregame_lineups(stats_years):
 
         for player in away_lineup:
             try:
-                player_name = player_bat_df[player_bat_df["Name"] == player].reset_index().Name[0]
-                player_obp = player_bat_df[player_bat_df["Name"] == player].reset_index().OBP[0]
-                player_slg = player_bat_df[player_bat_df["Name"] == player].reset_index().SLG[0]
-                player_1b = player_bat_df[player_bat_df["Name"] == player].reset_index()["1B"][0]
-                player_2b = player_bat_df[player_bat_df["Name"] == player].reset_index()["2B"][0]
-                player_3b = player_bat_df[player_bat_df["Name"] == player].reset_index()["3B"][0]
-                player_hr = player_bat_df[player_bat_df["Name"] == player].reset_index()["HR"][0]
+                player_name = (
+                    player_bat_df[player_bat_df["Name"].str.contains(player)]
+                    .reset_index()
+                    .Name[0]
+                )
+                player_obp = (
+                    player_bat_df[player_bat_df["Name"].str.contains(player)]
+                    .reset_index()
+                    .OBP[0]
+                )
+                player_slg = (
+                    player_bat_df[player_bat_df["Name"].str.contains(player)]
+                    .reset_index()
+                    .SLG[0]
+                )
+                player_1b = player_bat_df[
+                    player_bat_df["Name"].str.contains(player)
+                ].reset_index()["1B"][0]
+                player_2b = player_bat_df[
+                    player_bat_df["Name"].str.contains(player)
+                ].reset_index()["2B"][0]
+                player_3b = player_bat_df[
+                    player_bat_df["Name"].str.contains(player)
+                ].reset_index()["3B"][0]
+                player_hr = player_bat_df[
+                    player_bat_df["Name"].str.contains(player)
+                ].reset_index()["HR"][0]
             except (AttributeError, KeyError):
                 player_name = player
                 player_team = matchup_list[lineup][0]
-                player_obp = player_bat_df[player_bat_df["Tm"] == player_team].OBP.median()
-                player_slg = player_bat_df[player_bat_df["Tm"] == player_team].SLG.median()
-                player_1b = player_bat_df[player_bat_df["Tm"] == player_team]["1B"].median()
-                player_2b = player_bat_df[player_bat_df["Tm"] == player_team]["2B"].median()
-                player_3b = player_bat_df[player_bat_df["Tm"] == player_team]["3B"].median()
-                player_hr = player_bat_df[player_bat_df["Tm"] == player_team]["HR"].median()
+                player_obp = player_bat_df[
+                    player_bat_df["Tm"] == player_team
+                ].OBP.median()
+                player_slg = player_bat_df[
+                    player_bat_df["Tm"] == player_team
+                ].SLG.median()
+                player_1b = player_bat_df[player_bat_df["Tm"] == player_team][
+                    "1B"
+                ].median()
+                player_2b = player_bat_df[player_bat_df["Tm"] == player_team][
+                    "2B"
+                ].median()
+                player_3b = player_bat_df[player_bat_df["Tm"] == player_team][
+                    "3B"
+                ].median()
+                player_hr = player_bat_df[player_bat_df["Tm"] == player_team][
+                    "HR"
+                ].median()
 
-            away_player_stat.append([player_name, player_obp, player_slg, player_1b, player_2b, player_3b, player_hr])
+            away_player_stat.append(
+                [
+                    player_name,
+                    player_obp,
+                    player_slg,
+                    player_1b,
+                    player_2b,
+                    player_3b,
+                    player_hr,
+                ]
+            )
 
         for player in home_lineup:
             try:
-                player_name = player_bat_df[player_bat_df["Name"] == player].reset_index().Name[0]
-                player_obp = player_bat_df[player_bat_df["Name"] == player].reset_index().OBP[0]
-                player_slg = player_bat_df[player_bat_df["Name"] == player].reset_index().SLG[0]
-                player_1b = player_bat_df[player_bat_df["Name"] == player].reset_index()["1B"][0]
-                player_2b = player_bat_df[player_bat_df["Name"] == player].reset_index()["2B"][0]
-                player_3b = player_bat_df[player_bat_df["Name"] == player].reset_index()["3B"][0]
-                player_hr = player_bat_df[player_bat_df["Name"] == player].reset_index()["HR"][0]
+                player_name = (
+                    player_bat_df[player_bat_df["Name"].str.contains(player)]
+                    .reset_index()
+                    .Name[0]
+                )
+                player_obp = (
+                    player_bat_df[player_bat_df["Name"].str.contains(player)]
+                    .reset_index()
+                    .OBP[0]
+                )
+                player_slg = (
+                    player_bat_df[player_bat_df["Name"].str.contains(player)]
+                    .reset_index()
+                    .SLG[0]
+                )
+                player_1b = player_bat_df[
+                    player_bat_df["Name"].str.contains(player)
+                ].reset_index()["1B"][0]
+                player_2b = player_bat_df[
+                    player_bat_df["Name"].str.contains(player)
+                ].reset_index()["2B"][0]
+                player_3b = player_bat_df[
+                    player_bat_df["Name"].str.contains(player)
+                ].reset_index()["3B"][0]
+                player_hr = player_bat_df[
+                    player_bat_df["Name"].str.contains(player)
+                ].reset_index()["HR"][0]
             except (AttributeError, KeyError):
                 player_name = player
                 player_team = matchup_list[lineup][0]
-                player_obp = player_bat_df[player_bat_df["Tm"] == player_team].OBP.median()
-                player_slg = player_bat_df[player_bat_df["Tm"] == player_team].SLG.median()
-                player_1b = player_bat_df[player_bat_df["Tm"] == player_team]["1B"].median()
-                player_2b = player_bat_df[player_bat_df["Tm"] == player_team]["2B"].median()
-                player_3b = player_bat_df[player_bat_df["Tm"] == player_team]["3B"].median()
-                player_hr = player_bat_df[player_bat_df["Tm"] == player_team]["HR"].median()
+                player_obp = player_bat_df[
+                    player_bat_df["Tm"] == player_team
+                ].OBP.median()
+                player_slg = player_bat_df[
+                    player_bat_df["Tm"] == player_team
+                ].SLG.median()
+                player_1b = player_bat_df[player_bat_df["Tm"] == player_team][
+                    "1B"
+                ].median()
+                player_2b = player_bat_df[player_bat_df["Tm"] == player_team][
+                    "2B"
+                ].median()
+                player_3b = player_bat_df[player_bat_df["Tm"] == player_team][
+                    "3B"
+                ].median()
+                player_hr = player_bat_df[player_bat_df["Tm"] == player_team][
+                    "HR"
+                ].median()
 
-            home_player_stat.append([player_name, player_obp, player_slg, player_1b, player_2b, player_3b, player_hr])
+            home_player_stat.append(
+                [
+                    player_name,
+                    player_obp,
+                    player_slg,
+                    player_1b,
+                    player_2b,
+                    player_3b,
+                    player_hr,
+                ]
+            )
 
         lineup_stats.append([away_player_stat, home_player_stat])
 
         try:
-            player_name = player_pitch_df[player_pitch_df["Name"] == away_pitcher].reset_index().Name[0]
-            player_whip = player_pitch_df[player_pitch_df["Name"] == away_pitcher].reset_index().WHIP[0]
-            player_era = player_pitch_df[player_pitch_df["Name"] == away_pitcher].reset_index().ERA[0]
+            player_name = (
+                player_pitch_df[player_pitch_df["Name"] == away_pitcher]
+                .reset_index()
+                .Name[0]
+            )
+            player_whip = (
+                player_pitch_df[player_pitch_df["Name"] == away_pitcher]
+                .reset_index()
+                .WHIP[0]
+            )
+            player_era = (
+                player_pitch_df[player_pitch_df["Name"] == away_pitcher]
+                .reset_index()
+                .ERA[0]
+            )
             player_team = matchup_list[lineup][0]
-            team_whip = player_pitch_df[player_pitch_df["Tm"] == player_team].WHIP.median()
+            team_whip = player_pitch_df[
+                player_pitch_df["Tm"] == player_team
+            ].WHIP.median()
+            player_out = (
+                player_pitch_df[player_pitch_df["Name"] == away_pitcher]
+                .reset_index()
+                .O[0]
+            )
+            team_out = player_pitch_df[player_pitch_df["Tm"] == player_team].O.median()
         except (AttributeError, KeyError):
             player_name = away_pitcher
             player_team = matchup_list[lineup][0]
-            player_whip = player_pitch_df[player_pitch_df["Tm"] == player_team].WHIP.median()
-            player_era = player_pitch_df[player_pitch_df["Tm"] == player_team].ERA.median()
-            team_whip = player_pitch_df[player_pitch_df["Tm"] == player_team].WHIP.median()
+            player_whip = player_pitch_df[
+                player_pitch_df["Tm"] == player_team
+            ].WHIP.median()
+            player_era = player_pitch_df[
+                player_pitch_df["Tm"] == player_team
+            ].ERA.median()
+            team_whip = player_pitch_df[
+                player_pitch_df["Tm"] == player_team
+            ].WHIP.median()
+            player_out = player_pitch_df[
+                player_pitch_df["Tm"] == player_team
+            ].O.median()
+            team_out = player_pitch_df[player_pitch_df["Tm"] == player_team].O.median()
 
-        away_pitcher_stat.append([player_name, player_whip, player_era, team_whip])
+        away_pitcher_stat.append(
+            [
+                player_name,
+                player_whip,
+                player_era,
+                team_whip,
+                player_out,
+                team_out,
+            ]
+        )
 
         try:
-            player_name = player_pitch_df[player_pitch_df["Name"] == home_pitcher].reset_index().Name[0]
-            player_whip = player_pitch_df[player_pitch_df["Name"] == home_pitcher].reset_index().WHIP[0]
-            player_era = player_pitch_df[player_pitch_df["Name"] == home_pitcher].reset_index().ERA[0]
+            player_name = (
+                player_pitch_df[player_pitch_df["Name"] == home_pitcher]
+                .reset_index()
+                .Name[0]
+            )
+            player_whip = (
+                player_pitch_df[player_pitch_df["Name"] == home_pitcher]
+                .reset_index()
+                .WHIP[0]
+            )
+            player_era = (
+                player_pitch_df[player_pitch_df["Name"] == home_pitcher]
+                .reset_index()
+                .ERA[0]
+            )
             player_team = matchup_list[lineup][1]
-            team_whip = player_pitch_df[player_pitch_df["Tm"] == player_team].WHIP.median()
+            team_whip = player_pitch_df[
+                player_pitch_df["Tm"] == player_team
+            ].WHIP.median()
+            player_out = (
+                player_pitch_df[player_pitch_df["Name"] == home_pitcher]
+                .reset_index()
+                .O[0]
+            )
+            team_out = player_pitch_df[player_pitch_df["Tm"] == player_team].O.median()
         except (AttributeError, KeyError):
             player_name = home_pitcher
             player_team = matchup_list[lineup][1]
-            player_whip = player_pitch_df[player_pitch_df["Tm"] == player_team].WHIP.median()
-            player_era = player_pitch_df[player_pitch_df["Tm"] == player_team].ERA.median()
-            team_whip = player_pitch_df[player_pitch_df["Tm"] == player_team].WHIP.median()
+            player_whip = player_pitch_df[
+                player_pitch_df["Tm"] == player_team
+            ].WHIP.median()
+            player_era = player_pitch_df[
+                player_pitch_df["Tm"] == player_team
+            ].ERA.median()
+            team_whip = player_pitch_df[
+                player_pitch_df["Tm"] == player_team
+            ].WHIP.median()
+            player_out = player_pitch_df[
+                player_pitch_df["Tm"] == player_team
+            ].O.median()
+            team_out = player_pitch_df[player_pitch_df["Tm"] == player_team].O.median()
 
-        home_pitcher_stat.append([player_name, player_whip, player_era, team_whip])
+        home_pitcher_stat.append(
+            [
+                player_name,
+                player_whip,
+                player_era,
+                team_whip,
+                player_out,
+                team_out,
+            ]
+        )
 
         pitching_matchup_stats.append([away_pitcher_stat, home_pitcher_stat])
 
