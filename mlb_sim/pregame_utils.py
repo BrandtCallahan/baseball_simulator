@@ -1,6 +1,5 @@
 """
-Take some time to figure out this code.
-It has everything that I need to scrape: lineups, pitchers, and gambling lines.
+    IMPORTS
 """
 from beautiful_soup_helper import get_soup_from_url
 
@@ -52,12 +51,18 @@ class PlayerStruct(object):
         self.name = name
 
     def __eq__(self, other):
-        return self.team == other.team and self.rotowire_id == other.rotowire_id and \
-               self.position == other.position and self.hand == other.hand
+        return (
+            self.team == other.team
+            and self.rotowire_id == other.rotowire_id
+            and self.position == other.position
+            and self.hand == other.hand
+        )
 
 
 class Game(object):
-    def __init__(self, away_lineup, away_pitcher, home_lineup, home_pitcher, game_date, game_time):
+    def __init__(
+        self, away_lineup, away_pitcher, home_lineup, home_pitcher, game_date, game_time
+    ):
         self.home_lineup = home_lineup
         self.away_lineup = away_lineup
         self.away_pitcher = away_pitcher
@@ -116,7 +121,7 @@ class GamblingLines(object):
 
 
 def get_game_lineups(url=None, game_date=None):
-    """ Mine the RotoWire daily lineups page and get the players' name, team, and RotoWire ID
+    """Mine the RotoWire daily lineups page and get the players' name, team, and RotoWire ID
     Commit the GameEntry objects to the database.
     :param game_date: datetime date object of the game date (default is None)
     :param url: the URL containing the daily lineups (default is None)
@@ -141,33 +146,61 @@ def get_game_lineups(url=None, game_date=None):
         home_team_abbreviation = "UNKNOWN"
         try:
             top_soup = game_node.find("div", {"class": "lineup__top"})
-            away_team_abbreviation = top_soup.find("div", {"class": "lineup__team is-visit"}).find("div", {
-                "class": "lineup__abbr"}).text
-            home_team_abbreviation = top_soup.find("div", {"class": "lineup__team is-home"}).find("div", {
-                "class": "lineup__abbr"}).text
-            game_time = game_node.parent.find("div", {"class": "lineup__time"}).text.replace("ET", "").strip()
-            game_time = datetime.strptime(game_time, '%I:%M %p').strftime("%H:%M")
+            away_team_abbreviation = (
+                top_soup.find("div", {"class": "lineup__team is-visit"})
+                .find("div", {"class": "lineup__abbr"})
+                .text
+            )
+            home_team_abbreviation = (
+                top_soup.find("div", {"class": "lineup__team is-home"})
+                .find("div", {"class": "lineup__abbr"})
+                .text
+            )
+            game_time = (
+                game_node.parent.find("div", {"class": "lineup__time"})
+                .text.replace("ET", "")
+                .strip()
+            )
+            game_time = datetime.strptime(game_time, "%I:%M %p").strftime("%H:%M")
 
             main_game_node = game_node.find("div", {"class": "lineup__main"})
-            away_lineup_node = main_game_node.find("ul", {"class": "lineup__list is-visit"})
-            home_lineup_node = main_game_node.find("ul", {"class": "lineup__list is-home"})
+            away_lineup_node = main_game_node.find(
+                "ul", {"class": "lineup__list is-visit"}
+            )
+            home_lineup_node = main_game_node.find(
+                "ul", {"class": "lineup__list is-home"}
+            )
 
-            for away_player in away_lineup_node.findAll("li", {"class": AWAY_TEAM_PLAYER_LABEL}):
+            for away_player in away_lineup_node.findAll(
+                "li", {"class": AWAY_TEAM_PLAYER_LABEL}
+            ):
                 away_team_lineup.append(get_hitter(away_player, away_team_abbreviation))
-            for home_player in home_lineup_node.findAll("li", {"class": HOME_TEAM_PLAYER_LABEL}):
+            for home_player in home_lineup_node.findAll(
+                "li", {"class": HOME_TEAM_PLAYER_LABEL}
+            ):
                 home_team_lineup.append(get_hitter(home_player, home_team_abbreviation))
 
-            away_pitcher = away_lineup_node.find("div", {"class": "lineup__player-highlight-name"})
+            away_pitcher = away_lineup_node.find(
+                "div", {"class": "lineup__player-highlight-name"}
+            )
             away_team_pitcher = get_pitcher(away_pitcher, away_team_abbreviation)
-            home_pitcher = home_lineup_node.find("div", {"class": "lineup__player-highlight-name"})
+            home_pitcher = home_lineup_node.find(
+                "div", {"class": "lineup__player-highlight-name"}
+            )
             home_team_pitcher = get_pitcher(home_pitcher, home_team_abbreviation)
         # No pitchers present on page
         except AttributeError:
             # print("Game between %s and %s is not valid." % (away_team_abbreviation, home_team_abbreviation))
             continue
 
-        current_game = Game(away_team_lineup, away_team_pitcher, home_team_lineup, home_team_pitcher, str(game_date),
-                            str(game_time))
+        current_game = Game(
+            away_team_lineup,
+            away_team_pitcher,
+            home_team_lineup,
+            home_team_pitcher,
+            str(game_date),
+            str(game_time),
+        )
 
         if current_game.is_valid():
             #     game_factors = get_external_game_factors(game_node, home_team_abbreviation)
@@ -186,14 +219,14 @@ def get_game_lineups(url=None, game_date=None):
 
 
 def get_id(soup):
-    """ Get the RotoWire ID from a BeautifulSoup node
+    """Get the RotoWire ID from a BeautifulSoup node
     :param soup: BeautifulSoup object of the player in the daily lineups page
     """
     return soup.find("a").get("href").split(f"-")[2]
 
 
 def get_hitter(soup, team):
-    """ Get a PlayerStruct representing a hitter
+    """Get a PlayerStruct representing a hitter
     If a database session is not provided, open the player page to obtain the hitter info.
     Otherwise, look for the hitter in the database. If not found, open the player page to obtain the hitter info.
     :param soup: BeautifulSoup object of the hitter in the daily lineups page
@@ -209,7 +242,7 @@ def get_hitter(soup, team):
 
 
 def get_pitcher(soup, team):
-    """ Get a PlayerStruct representing a pitcher
+    """Get a PlayerStruct representing a pitcher
     If a database session is not provided, open the player page to obtain the pitcher info.
     Otherwise, look for the pitcher in the database. If not found, open the player page to obtain the pitcher info.
     :param soup: BeautifulSoup object of the pitcher in the daily lineups page
@@ -240,7 +273,7 @@ def get_hand_bats(soup):
 
 
 def get_name_from_id(rotowire_id):
-    """ Use the acquired RotoWire ID to resolve the name in case it is too long for the
+    """Use the acquired RotoWire ID to resolve the name in case it is too long for the
     daily lineups page.
     :param rotowire_id: unique ID for a player in RotoWire
     :return: str representation of the name of the player
@@ -251,17 +284,23 @@ def get_name_from_id(rotowire_id):
 
 class TableNotFound(Exception):
     def __init__(self, table_name):
-        super(TableNotFound, self).__init__("Table '%s' not found in the Baseball Reference page" % table_name)
+        super(TableNotFound, self).__init__(
+            "Table '%s' not found in the Baseball Reference page" % table_name
+        )
 
 
 class HitterNotFound(Exception):
     def __init__(self, id_str):
-        super(HitterNotFound, self).__init__("Hitter '%s' not found in the database" % id_str)
+        super(HitterNotFound, self).__init__(
+            "Hitter '%s' not found in the database" % id_str
+        )
 
 
 class PitcherNotFound(Exception):
     def __init__(self, id_str):
-        super(PitcherNotFound, self).__init__("Pitcher '%s' not found in the database" % id_str)
+        super(PitcherNotFound, self).__init__(
+            "Pitcher '%s' not found in the database" % id_str
+        )
 
 
 def table_entry_to_int(entry):
@@ -269,7 +308,7 @@ def table_entry_to_int(entry):
 
 
 def get_table_row_dict(soup, table_name, table_row_label, table_column_label):
-    """ Get a dictionary representation of the given row in the table
+    """Get a dictionary representation of the given row in the table
     :param soup: BeautifulSoup object containing a single "table" HTML object
     :param table_name: HTML "id" field for the table
     :param table_row_label: HTML label for the row of the table
@@ -308,7 +347,7 @@ def get_table_row_dict(soup, table_name, table_row_label, table_column_label):
 
 
 def get_wind_speed(weather_node):
-    """ Extract the wind speed from the Rotowire game soup
+    """Extract the wind speed from the Rotowire game soup
     :param soup: Rotowire soup for the individual game
     :return: an integer representation of the wind speed (negative for "In", positive for "Out", zero otherwise)
     """
@@ -323,7 +362,7 @@ def get_wind_speed(weather_node):
 
 
 def get_temperature(weather_node):
-    """ Extract the temperature from the Rotowire game soup
+    """Extract the temperature from the Rotowire game soup
     :param weather_node: Rotowire soup for the individual game
     :return: an integer representation of the temperature (in degrees Fahrenheit)
     """
@@ -337,7 +376,7 @@ class UmpDataNotFound(Exception):
 
 
 def get_ump_name(soup):
-    """ Extract the strikeouts per 9 innings for the ump for a given game
+    """Extract the strikeouts per 9 innings for the ump for a given game
     :param soup: Rotowire soup for the individual game
     :return: float representation of the strikeouts per game
     """
@@ -345,7 +384,7 @@ def get_ump_name(soup):
 
 
 def get_ump_ks_per_game(soup):
-    """ Extract the strikeouts per 9 innings for the ump for a given game
+    """Extract the strikeouts per 9 innings for the ump for a given game
     :param soup: Rotowire soup for the individual game
     :return: float representation of the strikeouts per game
     """
@@ -365,7 +404,7 @@ def get_ump_ks_per_game(soup):
 
 
 def get_ump_runs_per_game(soup):
-    """ Extract the strikeouts per 9 innings for the ump for a given game
+    """Extract the strikeouts per 9 innings for the ump for a given game
     :param soup: Rotowire soup for the individual game
     :return: float representation of the strikeouts per game
     """
@@ -399,10 +438,16 @@ def get_game_matchups(url=None, game_date=None):
         try:
             matchup = GameMatchup()
             game_node = header_node.parent
-            matchup.away_team = game_node.find("div", {"class": AWAY_TEAM_REGION_LABEL}).find("div", {
-                "class": "lineup__abbr"}).text
-            matchup.home_team = game_node.find("div", {"class": HOME_TEAM_REGION_LABEL}).find("div", {
-                "class": "lineup__abbr"}).text
+            matchup.away_team = (
+                game_node.find("div", {"class": AWAY_TEAM_REGION_LABEL})
+                .find("div", {"class": "lineup__abbr"})
+                .text
+            )
+            matchup.home_team = (
+                game_node.find("div", {"class": HOME_TEAM_REGION_LABEL})
+                .find("div", {"class": "lineup__abbr"})
+                .text
+            )
             # game_time = game_node.find("div", {"class": TIME_REGION_LABEL}).find("a").text.replace("ET", "").strip()
             # matchup.game_time = datetime.strptime(game_time, '%I:%M %p').strftime("%H:%M")
             matchup.game_date = str(game_date)
@@ -437,25 +482,31 @@ def get_game_gambling(url=None, game_date=None):
             gambling_line = GamblingLines()
             game_node = header_node.parent
             gambling_line.date = game_date
-            gambling_line.favorite = game_node.findAll(
-                "div", {"class": "lineup__odds-item"}
-            )[0].find(
-                "span", {"class": "composite hide"}
-            ).text.split()[0]
-            gambling_line.money_line = game_node.findAll(
-                "div", {"class": "lineup__odds-item"}
-            )[0].find(
-                "span", {"class": "composite hide"}
-            ).text.split()[1]
-            gambling_line.over_under = game_node.findAll(
-                "div", {"class": "lineup__odds-item"}
-            )[1].find(
-                "span", {"class": "composite hide"}
-            ).text.split()[0]
-            gambling_line.away_team = game_node.find("div", {"class": AWAY_TEAM_REGION_LABEL}).find("div", {
-                "class": "lineup__abbr"}).text
-            gambling_line.home_team = game_node.find("div", {"class": HOME_TEAM_REGION_LABEL}).find("div", {
-                "class": "lineup__abbr"}).text
+            gambling_line.favorite = (
+                game_node.findAll("div", {"class": "lineup__odds-item"})[0]
+                .find("span", {"class": "composite hide"})
+                .text.split()[0]
+            )
+            gambling_line.money_line = (
+                game_node.findAll("div", {"class": "lineup__odds-item"})[0]
+                .find("span", {"class": "composite hide"})
+                .text.split()[1]
+            )
+            gambling_line.over_under = (
+                game_node.findAll("div", {"class": "lineup__odds-item"})[1]
+                .find("span", {"class": "composite hide"})
+                .text.split()[0]
+            )
+            gambling_line.away_team = (
+                game_node.find("div", {"class": AWAY_TEAM_REGION_LABEL})
+                .find("div", {"class": "lineup__abbr"})
+                .text
+            )
+            gambling_line.home_team = (
+                game_node.find("div", {"class": HOME_TEAM_REGION_LABEL})
+                .find("div", {"class": "lineup__abbr"})
+                .text
+            )
 
         except IndexError:
             # print("Game between %s and %s is not valid." % (away_team_abbreviation, home_team_abbreviation))

@@ -11,11 +11,13 @@ from datetime import date
 class Http404Exception(Exception):
 
     def __init__(self, invalid_url):
-        super(Http404Exception, self).__init__("Attempt to access invalid URL %s." % invalid_url)
+        super(Http404Exception, self).__init__(
+            "Attempt to access invalid URL %s." % invalid_url
+        )
 
 
 def str_to_date(date_string):
-    """ Convert a PitchFx date string to a Date object
+    """Convert a PitchFx date string to a Date object
     :param date_string: a PitchFx date string
     :return the Date object representing the string
     """
@@ -25,7 +27,7 @@ def str_to_date(date_string):
 
 
 def url_to_comment_soup(url):
-    """ In order to mine JavaScript, mine the comments
+    """In order to mine JavaScript, mine the comments
     :param url: the absolute URL string
     :return: the BeautifulSoup object containing the comments, return None if the object was not
     successfully created
@@ -46,7 +48,7 @@ def url_to_comment_soup(url):
 
 
 def url_to_soup(url):
-    """ Take a URL and get the BeautifulSoup object
+    """Take a URL and get the BeautifulSoup object
     :param url: the absolute URL string
     :return the BeautifulSoup object returned, return None if the object was not successfully created
     """
