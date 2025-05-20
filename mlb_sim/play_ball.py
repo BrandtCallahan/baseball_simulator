@@ -13,7 +13,7 @@ def play_ball_mlb_daily(stats_years=None, save=False):
         stats_years = []
     if len(stats_years) == 0:
         curr_year = datetime.now().year
-        stats_years = [curr_year-1, curr_year]
+        stats_years = [curr_year - 1, curr_year]
 
     game_data = pregame_lineups(stats_years)
     matchup_list = game_data[0]
@@ -25,10 +25,19 @@ def play_ball_mlb_daily(stats_years=None, save=False):
     for game in range(len(matchup_list)):
 
         try:
-            game_df = single_simulation(5000, game, matchup_list, lineup_stats, pitching_matchup_stats, game_gambling)
+            game_df = single_simulation(
+                5000,
+                game,
+                matchup_list,
+                lineup_stats,
+                pitching_matchup_stats,
+                # game_gambling,
+            )
             daily_games = pd.concat([daily_games, game_df]).reset_index(drop=True)
         except IndexError:
-            logger.info(f"Error with {matchup_list[game][0]} vs. {matchup_list[game][1]}")
+            logger.info(
+                f"Error with {matchup_list[game][0]} vs. {matchup_list[game][1]}"
+            )
             continue
 
     if save:
@@ -40,33 +49,38 @@ def play_ball_mlb_daily(stats_years=None, save=False):
             os.mkdir(dir_path)
             if save_csv:
                 daily_games.to_csv(file_path)
-    
+
         elif os.path.exists(file_path):
             logger.info(f"Loading previous data")
             temp_df = pd.read_csv(file_path)
-            logger.info(f"Appending today's games: {datetime.now().strftime('%Y-%m-%d')}")
+            logger.info(
+                f"Appending today's games: {datetime.now().strftime('%Y-%m-%d')}"
+            )
             all_games = pd.concat([temp_df, daily_games]).reset_index(drop=True)
-            all_games = all_games[["date",
-                                   "away_team",
-                                   "away_pitcher",
-                                   "away_lineup",
-                                   "home_team",
-                                   "home_pitcher",
-                                   "home_lineup",
-                                   "favorite",
-                                   "over_under",
-                                   "away_team_ml_pct",
-                                   "home_team_ml_pct",
-                                   "away_team_spread_pct",
-                                   "home_team_spread_pct",
-                                   "fav_ml_pct",
-                                   "dog_ml_pct",
-                                   "fav_spread_pct",
-                                   "dog_ml_pct",
-                                   "over_pct",
-                                   "under_pct",
-                                   "push_pct",
-                                   ]]
+            all_games = all_games[
+                [
+                    "date",
+                    "away_team",
+                    "away_pitcher",
+                    "away_lineup",
+                    "home_team",
+                    "home_pitcher",
+                    "home_lineup",
+                    "favorite",
+                    "over_under",
+                    "away_team_ml_pct",
+                    "home_team_ml_pct",
+                    "away_team_spread_pct",
+                    "home_team_spread_pct",
+                    "fav_ml_pct",
+                    "dog_ml_pct",
+                    "fav_spread_pct",
+                    "dog_ml_pct",
+                    "over_pct",
+                    "under_pct",
+                    "push_pct",
+                ]
+            ]
             if save_csv:
                 all_games.to_csv(file_path)
     else:
