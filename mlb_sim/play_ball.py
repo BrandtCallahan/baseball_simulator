@@ -41,7 +41,7 @@ def play_ball_mlb_daily(stats_years=None, save=False):
             continue
 
     if save:
-        username = "bcallahan"
+        username = ""
         dir_path = f"/Users/{username}/Desktop/mlb_simulator/"
         file_path = dir_path + "daily_mlb_games.csv"
         if not os.path.exists(file_path):
