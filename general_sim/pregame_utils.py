@@ -18,6 +18,9 @@ def stats_data(type):
         # pitching df
         df = pd.read_csv(url)
         df["WHIP"] = (df["BB"] + df["H"]) / df["IP"]
+        df["O%"] = ((df["BF"] - df["IBB"]) - (df["H"] + df["BB"] + df["HBP"])) / (
+            df["BF"] - df["IBB"]
+        )
         df["Player"] = df["Player"].str.lower().str.replace(".", "")
 
     else:
@@ -47,38 +50,44 @@ def offense():
     away_lineup = pd.DataFrame()
     away_lineup_stats = []
     for n, player in enumerate(away_team_lineup):
-        temp = batting_df[(batting_df["Player"] == player.lower()) & (batting_df["Team"] == away_team)][
-            ["Team", "Player", "OBP", "SLG", "1B", "2B", "3B", "HR"]]
+        temp = batting_df[
+            (batting_df["Player"] == player.lower()) & (batting_df["Team"] == away_team)
+        ][["Team", "Player", "OBP", "SLG", "1B", "2B", "3B", "HR"]]
         away_lineup = pd.concat([away_lineup, temp]).reset_index(drop=True)
 
-        away_lineup_stats += [[
-            away_lineup["Team"][n],
-            away_lineup["Player"][n],
-            away_lineup["OBP"][n],
-            away_lineup["SLG"][n],
-            away_lineup["1B"][n],
-            away_lineup["2B"][n],
-            away_lineup["3B"][n],
-            away_lineup["HR"][n],
-        ]]
+        away_lineup_stats += [
+            [
+                away_lineup["Team"][n],
+                away_lineup["Player"][n],
+                away_lineup["OBP"][n],
+                away_lineup["SLG"][n],
+                away_lineup["1B"][n],
+                away_lineup["2B"][n],
+                away_lineup["3B"][n],
+                away_lineup["HR"][n],
+            ]
+        ]
 
     home_lineup = pd.DataFrame()
     home_lineup_stats = []
     for n, player in enumerate(home_team_lineup):
-        temp = batting_df[(batting_df["Player"] == player.lower()) & (batting_df["Team"] == home_team)][
-            ["Team", "Player", "OBP", "SLG", "1B", "2B", "3B", "HR"]]
+        temp = batting_df[
+            (batting_df["Player"] == player.lower()) & (batting_df["Team"] == home_team)
+        ][["Team", "Player", "OBP", "SLG", "1B", "2B", "3B", "HR"]]
         home_lineup = pd.concat([home_lineup, temp]).reset_index(drop=True)
 
-        home_lineup_stats += [[
-            home_lineup["Team"][n],
-            home_lineup["Player"][n],
-            home_lineup["OBP"][n],
-            home_lineup["SLG"][n],
-            home_lineup["1B"][n],
-            home_lineup["2B"][n],
-            home_lineup["3B"][n],
-            home_lineup["HR"][n],
-        ]]
+        home_lineup_stats += [
+            [
+                home_lineup["Team"][n],
+                home_lineup["Player"][n],
+                home_lineup["OBP"][n],
+                home_lineup["SLG"][n],
+                home_lineup["1B"][n],
+                home_lineup["2B"][n],
+                home_lineup["3B"][n],
+                home_lineup["HR"][n],
+            ]
+        ]
 
     lineup_stats = []
     lineup_stats += [away_lineup_stats]
@@ -96,48 +105,65 @@ def pitching():
     pitching_df = stats_data("pitching")
 
     away_team_pitcher = []
-    for player in range(1, int(games)+1):
-        away_team_pitcher += [input(f"Enter {away_team}'s #{player} pitcher's name: \n")]
+    for player in range(1, int(games) + 1):
+        away_team_pitcher += [
+            input(f"Enter {away_team}'s #{player} pitcher's name: \n")
+        ]
 
     home_team_pitcher = []
-    for player in range(1, int(games)+1):
-        home_team_pitcher += [input(f"Enter {home_team}'s #{player} pitcher's name: \n")]
+    for player in range(1, int(games) + 1):
+        home_team_pitcher += [
+            input(f"Enter {home_team}'s #{player} pitcher's name: \n")
+        ]
 
     away_pitcher = pd.DataFrame()
     away_pitcher_stats = []
     for n, player in enumerate(away_team_pitcher):
-        temp = pitching_df[(pitching_df["Player"] == player.lower()) & (pitching_df["Team"] == away_team)][
-            ["Team", "Player", "ERA", "WHIP"]].reset_index(drop=True)
+        temp = pitching_df[
+            (pitching_df["Player"] == player.lower())
+            & (pitching_df["Team"] == away_team)
+        ][["Team", "Player", "ERA", "WHIP", 'O%']].reset_index(drop=True)
         away_pitcher = pd.concat([away_pitcher, temp]).reset_index(drop=True)
 
-        away_pitcher_stats += [[away_pitcher["Team"][n],
-                               away_pitcher["Player"][n],
-                               away_pitcher["ERA"][n],
-                               away_pitcher["WHIP"][n],
-                               pitching_df[(pitching_df["Team"] == away_team)
-                                           & (pitching_df["GS"] < pitching_df["GS"].quantile(0.75))].WHIP.median()
-                               ]]
-
+        away_pitcher_stats += [
+            [
+                away_pitcher["Team"][n],
+                away_pitcher["Player"][n],
+                away_pitcher["ERA"][n],
+                away_pitcher["WHIP"][n],
+                away_pitcher['O%'][n],
+                pitching_df[
+                    (pitching_df["Team"] == away_team)
+                    & (pitching_df["GS"] < pitching_df["GS"].quantile(0.75))
+                ]['O%'].median(),
+            ]
+        ]
 
     home_pitcher = pd.DataFrame()
     home_pitcher_stats = []
     for n, player in enumerate(home_team_pitcher):
-        temp = pitching_df[(pitching_df["Player"] == player.lower()) & (pitching_df["Team"] == home_team)][
-            ["Team", "Player", "ERA", "WHIP"]].reset_index(drop=True)
+        temp = pitching_df[
+            (pitching_df["Player"] == player.lower())
+            & (pitching_df["Team"] == home_team)
+        ][["Team", "Player", "ERA", "WHIP"]].reset_index(drop=True)
         home_pitcher = pd.concat([home_pitcher, temp]).reset_index(drop=True)
 
-        home_pitcher_stats += [[home_pitcher["Team"][n],
-                               home_pitcher["Player"][n],
-                               home_pitcher["ERA"][n],
-                               home_pitcher["WHIP"][n],
-                               pitching_df[(pitching_df["Team"] == home_team)
-                                           & (pitching_df["GS"] < pitching_df["GS"].quantile(0.75))].WHIP.median()
-                               ]]
+        home_pitcher_stats += [
+            [
+                home_pitcher["Team"][n],
+                home_pitcher["Player"][n],
+                home_pitcher["ERA"][n],
+                home_pitcher["WHIP"][n],
+                home_pitcher['O%'][n],
+                pitching_df[
+                    (pitching_df["Team"] == home_team)
+                    & (pitching_df["GS"] < pitching_df["GS"].quantile(0.75))
+                ]['O%'].median(),
+            ]
+        ]
 
     pitching_matchup_stats = []
     pitching_matchup_stats += [away_pitcher_stats]
     pitching_matchup_stats += [home_pitcher_stats]
 
     return pitching_matchup_stats
-
-# gambling odds
