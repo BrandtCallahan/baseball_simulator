@@ -4,7 +4,6 @@ from random import uniform
 # run through the lineup
 def Lineup(
     game_number,
-    matchup_list,
     lineup_stats,
     away_home_lineup,
     pitching_matchup_stats,
@@ -14,7 +13,7 @@ def Lineup(
 ):
 
     game = lineup_stats
-    matchup = [matchup_list[game_number][0], matchup_list[game_number][1]]
+    matchup = [game[0][0][0], game[1][0][0]]
     lineup = game[game_number][away_home_lineup]
     pitching_matchup = [
         pitching_matchup_stats[game_number][away_home_lineup][0][0],
