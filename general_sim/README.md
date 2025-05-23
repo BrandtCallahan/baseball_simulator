@@ -16,7 +16,7 @@ There are three functions that live here in order to set up the workings of an i
 Two functions live here that help create a the workings of a baseball game. The first is the actual playing of an inning with batters coming up to face the pitcher and having an outcome from each atbat. Offensive stats and atbat outcomes are tracked in order for box score stats to be tallied at the conclusion of the game. The inning will also keep track of the batter and who has made the last out in order to keep the correct order of atbats throughout the game. The gameboard() function is one that will run the inning() function and start to shape the scoreboard of the game. It works as a tracking mechanism for just one team's innings so two will have to be used for the course of a game. 
 
 ## Simulations
-### single_game.py, single_game_sim.py, series_sim.py
+### single_game.py, sim_utils.py, series_simulation.py
 There are three options for running through the simulator. 
 1. The first is just a single game where the output is a true scoreboard with inning totals on runs and total team run totals, hit totals, and runners left on base throughout the game. Also in the output are totals for walks, singles, doubles, triples, homeruns, and out totals detailed as strikeouts, groundouts and flyouts. 
 2. The next type of simulator run is a multi-run of single game. This will run the data given for the single game n number of times and that is defined in the function simulation(). The output here is similar to the true single game but will give averages based on the number of games played. Also in the output will be the number of games won by each team.
