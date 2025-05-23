@@ -1,12 +1,11 @@
 from random import uniform
 
-from inning_utils import Lineup, baserunning
+from inning_utils import Lineup, AtBat, baserunning
 
 
 # now we set the groundwork for an inning to take place
 def inning(
     game_number,
-    matchup_list,
     lineup_stats,
     away_home_lineup,
     pitching_matchup_stats,
@@ -43,31 +42,30 @@ def inning(
     while o < 3:  # inning continues as long as there are less than 3 outs
 
         # player SLG %
-        single_num = lineup_stats[game_number][away_home_lineup][batter][3]
-        double_num = lineup_stats[game_number][away_home_lineup][batter][4] + single_num
-        triple_num = lineup_stats[game_number][away_home_lineup][batter][5] + (
+        single_num = lineup_stats[away_home_lineup][batter][3]
+        double_num = lineup_stats[away_home_lineup][batter][4] + single_num
+        triple_num = lineup_stats[away_home_lineup][batter][5] + (
             double_num
         )
-        homer_num = lineup_stats[game_number][away_home_lineup][batter][6] + (
+        homer_num = lineup_stats[away_home_lineup][batter][6] + (
             triple_num
         )
         total_hits = 0
         for i in range(3, 7):
-            total_hits += lineup_stats[game_number][away_home_lineup][batter][i]
-        single = (lineup_stats[game_number][away_home_lineup][batter][3]) / total_hits
+            total_hits += lineup_stats[away_home_lineup][batter][i]
+        single = (lineup_stats[away_home_lineup][batter][3]) / total_hits
         double = (
-            lineup_stats[game_number][away_home_lineup][batter][4] + single_num
+            lineup_stats[away_home_lineup][batter][4] + single_num
         ) / total_hits
         triple = (
-            lineup_stats[game_number][away_home_lineup][batter][5] + (double_num)
+            lineup_stats[away_home_lineup][batter][5] + (double_num)
         ) / total_hits
         homer = (
-            lineup_stats[game_number][away_home_lineup][batter][6] + (triple_num)
+            lineup_stats[away_home_lineup][batter][6] + (triple_num)
         ) / total_hits
 
         AB = Lineup(
             game_number,
-            matchup_list,
             lineup_stats,
             away_home_lineup,
             pitching_matchup_stats,
@@ -202,7 +200,6 @@ def inning(
 # this function only sets up one teams "scoreboard" though
 def gameboard(
     game_number,
-    matchup_list,
     away_home_lineup,
     lineup_stats,
     pitching_matchup_stats,
@@ -237,7 +234,6 @@ def gameboard(
             batter = hrl[12]
         hrl = inning(
             game_number,
-            matchup_list,
             lineup_stats,
             away_home_lineup,
             pitching_matchup_stats,
