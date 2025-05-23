@@ -1,29 +1,34 @@
-import random
 from random import uniform
-import pandas as pd
-from datetime import date
 
 
 # run through the lineup
-def Lineup(game_number,
-           lineup_stats,
-           away_home_lineup,
-           pitching_matchup_stats,
-           away_home_pitcher,
-           batter,
-           pitchcount):
+def Lineup(
+    game_number,
+    matchup_list,
+    lineup_stats,
+    away_home_lineup,
+    pitching_matchup_stats,
+    away_home_pitcher,
+    batter,
+    pitchcount,
+):
 
     game = lineup_stats
-    matchup = [game[0][0][0], game[1][0][0]]
-    lineup = game[away_home_lineup]
-    pitching_matchup = [pitching_matchup_stats[away_home_lineup][game_number-1][1],
-                        pitching_matchup_stats[away_home_pitcher][game_number-1][1]]
-    pitcher = pitching_matchup_stats[away_home_pitcher][game_number-1]
+    matchup = [matchup_list[game_number][0], matchup_list[game_number][1]]
+    lineup = game[game_number][away_home_lineup]
+    pitching_matchup = [
+        pitching_matchup_stats[game_number][away_home_lineup][0][0],
+        pitching_matchup_stats[game_number][away_home_pitcher][0][0],
+    ]
+    team = matchup[away_home_pitcher]
+    pitcher = pitching_matchup_stats[game_number][away_home_pitcher][0]
 
-    if pitchcount <= 85:
-        atbat = AtBat(lineup[batter][2], pitcher[3]) + [batter]  # starter
+    if pitchcount <= 90:
+        atbat = AtBat(lineup[batter][1], pitcher[4]) + [batter]  # starter
     else:
-        atbat = AtBat(lineup[batter][2], pitcher[4]) + [batter]  # relief (median of bullpen WHIP)
+        atbat = AtBat(lineup[batter][1], pitcher[5]) + [
+            batter
+        ]  # relief (median of bullpen WHIP)
 
     return atbat
 
@@ -49,13 +54,12 @@ def AtBat(obp, whip):
     outcomelist = []
 
     aboutcome = []
-    # ab_tracker = []
 
     while (ball < 4 and strike < 3) and (out < 1 and ob < 1):
-        pitch = (uniform(0, 3))  # ball/strike
-        swing = (uniform(0, 1))  # swing/no swing
-        contact = (uniform(0, 1))  # contact/miss
-        fair = (uniform(0, 1))  # fair/foul
+        pitch = uniform(0, 1)  # ball/strike
+        swing = uniform(0, 1)  # swing/no swing
+        contact = uniform(0, 1)  # contact/miss
+        fair = uniform(0, 1)  # fair/foul
         outcome = uniform(0, 1)  # hit/out
 
         umperror = 0.05
@@ -127,15 +131,18 @@ def AtBat(obp, whip):
 
         pitchnum = 1
 
-        # new_pitch = Pitch(count, pitch, whip, obp, swing, contact, fair, outcome, umperror, count_dict)
         count_var = f"{ball}{strike}"
 
         if pitch < whip:  # ball
             if swing <= umperror:  # ump calls ball strike
                 strike += 1
-            elif swing > umperror and swing < count_dict[f"count{count_var}"]["noswing"]:  # no swing
+            elif (
+                swing > umperror and swing < count_dict[f"count{count_var}"]["noswing"]
+            ):  # no swing
                 ball += 1
-            elif swing > umperror and swing >= count_dict[f"count{count_var}"]["noswing"]:  # swing
+            elif (
+                swing > umperror and swing >= count_dict[f"count{count_var}"]["noswing"]
+            ):  # swing
                 if contact < count_dict[f"count{count_var}"]["whiff"]:  # miss
                     strike += 1
                 elif contact >= count_dict[f"count{count_var}"]["whiff"]:  # contact
@@ -155,9 +162,13 @@ def AtBat(obp, whip):
         elif pitch >= whip:  # strike
             if swing <= umperror:  # ump calls strike ball
                 ball += 1
-            elif swing > umperror and swing < count_dict[f"count{count_var}"]["noswing"]:  # no swing
+            elif (
+                swing > umperror and swing < count_dict[f"count{count_var}"]["noswing"]
+            ):  # no swing
                 strike += 1
-            elif swing > umperror and swing >= count_dict[f"count{count_var}"]["noswing"]:  # swing
+            elif (
+                swing > umperror and swing >= count_dict[f"count{count_var}"]["noswing"]
+            ):  # swing
                 if contact < count_dict[f"count{count_var}"]["whiff"]:  # miss
                     strike += 1
                 elif contact >= count_dict[f"count{count_var}"]["whiff"]:  # contact
@@ -173,8 +184,6 @@ def AtBat(obp, whip):
                         if outcome <= obp:
                             out = 0
                             ob = 1
-
-        # ab_tracker += [new_pitch]
 
         count = [ball] + [strike]
 
@@ -213,18 +222,14 @@ def AtBat(obp, whip):
 
 # this lays the groundwork for baserunners moving around the bases
 # it is atbat specific
+def baserunning(game_number, lineup_stats, aPOSlist, atbat, batter, away_home_lineup):
 
-def baserunning(aPOSlist, atbat, batter, away_home_lineup):
-    # atbat=[walk,hit,abSLG]
-
-    # single = 0.62
-    single = lineup_stats[away_home_lineup][batter][4]
-    # double = 0.82
-    double = lineup_stats[away_home_lineup][batter][5] + single
-    # triple = 0.84
-    triple = lineup_stats[away_home_lineup][batter][6] + (single + double)
-    # homer = 1
-    homer = lineup_stats[away_home_lineup][batter][7] + (single + double + triple)
+    single = lineup_stats[game_number][away_home_lineup][batter][3]
+    double = lineup_stats[game_number][away_home_lineup][batter][4] + single
+    triple = lineup_stats[game_number][away_home_lineup][batter][5] + (single + double)
+    homer = lineup_stats[game_number][away_home_lineup][batter][6] + (
+        single + double + triple
+    )
     basesruns = []
     SLG = atbat[2]
 
