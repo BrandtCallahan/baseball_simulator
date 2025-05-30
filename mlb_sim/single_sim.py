@@ -365,6 +365,7 @@ def single_simulation(
 
     RunDiff1 = []
     RunDiff2 = []
+    RunDiff = []
 
     tt1w = 0  # team 1 win total
     tt2w = 0  # team 2 win total
@@ -417,10 +418,12 @@ def single_simulation(
         if g[0] == 1:  # if 1 is returned from that run
             tw1 = 1  # then team 1 won so give them 1
             RunDiff1 += [rd]
+            RunDiff += [rd * 1]
 
         elif g[0] == 2:  # if anything else is returned
             tw2 = 1  # then team 2 won so give them 1
             RunDiff2 += [rd]
+            RunDiff += [rd * -1] # anchored to have the home team be negative (i.e. look like a favorite in current format)
 
         tt1w += tw1  # add up team 1 wins
         tt2w += tw2  # add up team 2 wins
@@ -519,6 +522,7 @@ def single_simulation(
             "away_team_win_diff": [round(float(sum(RunDiff1) / tt1w), 1)],
             "home_team_runs": [round(float(sum(RUNtotal2) / n), 0)],
             "home_team_win_diff": [round(float(sum(RunDiff2) / tt2w), 1)],
+            "matchup_run_diff": [round(float(sum(RunDiff) / n), 1)],
         },
     )
 
